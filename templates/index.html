@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scraping Progress</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Web Scraper Progress</h1>
+    <button id="start-button">Start Scraping</button>
+    <div id="progress-bar" style="width: 100%; background: #f3f3f3;">
+        <div id="progress" style="width: 0%; height: 30px; background: #4caf50;"></div>
+    </div>
+    <p id="status"></p>
+
+    <script>
+        $(document).ready(function() {
+            $('#start-button').click(function() {
+                $('#status').text('Starting scraping...');
+                $('#progress').css('width', '0%');
+                $.get('/start-scraping', function(data) {
+                    if (data.status === 'completed') {
+                        $('#status').text('Scraping completed!');
+                    }
+                });
+                checkProgress();
+            });
+
+            function checkProgress() {
+                setInterval(function() {
+                    $.get('/progress', function(data) {
+                        $('#progress').css('width', data.progress + '%');
+                    });
+                }, 1000); // Update progress every second
+            }
+        });
+    </script>
+</body>
+</html>
