@@ -9,6 +9,7 @@
 <body>
     <h1>Web Scraper Progress</h1>
     <button id="start-button">Start Scraping</button>
+    <button id="stop-button" disabled>Stop Scraping</button>
     <div id="progress-bar" style="width: 100%; background: #f3f3f3;">
         <div id="progress" style="width: 0%; height: 30px; background: #4caf50;"></div>
     </div>
@@ -19,12 +20,26 @@
             $('#start-button').click(function() {
                 $('#status').text('Starting scraping...');
                 $('#progress').css('width', '0%');
+                $('#start-button').prop('disabled', true);
+                $('#stop-button').prop('disabled', false);
+                
                 $.get('/start-scraping', function(data) {
-                    if (data.status === 'completed') {
-                        $('#status').text('Scraping completed!');
+                    if (data.status === 'started') {
+                        checkProgress();
+                    } else {
+                        $('#status').text('Scraping is already running.');
                     }
                 });
-                checkProgress();
+            });
+
+            $('#stop-button').click(function() {
+                $.get('/stop-scraping', function(data) {
+                    if (data.status === 'stopped') {
+                        $('#status').text('Scraping stopped.');
+                        $('#start-button').prop('disabled', false);
+                        $('#stop-button').prop('disabled', true);
+                    }
+                });
             });
 
             function checkProgress() {
